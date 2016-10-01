@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -27,20 +28,20 @@ public class Utils {
         JSONArray resultsArray = null;
         try {
             jsonObject = new JSONObject(JSON);
-            if (jsonObject != null && jsonObject.length() != 0) {
+            if (jsonObject.length() != 0) {
                 jsonObject = jsonObject.getJSONObject("query");
                 int count = Integer.parseInt(jsonObject.getString("count"));
                 if (count == 1) {
                     jsonObject = jsonObject.getJSONObject("results")
                             .getJSONObject("quote");
-                    batchOperations.add(buildBatchOperation(jsonObject));
+                    tryAddBatchOperation(batchOperations, jsonObject);
                 } else {
                     resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
                     if (resultsArray != null && resultsArray.length() != 0) {
                         for (int i = 0; i < resultsArray.length(); i++) {
                             jsonObject = resultsArray.getJSONObject(i);
-                            batchOperations.add(buildBatchOperation(jsonObject));
+                            tryAddBatchOperation(batchOperations, jsonObject);
                         }
                     }
                 }
@@ -49,6 +50,13 @@ public class Utils {
             Log.e(LOG_TAG, "String to JSON failed: " + e);
         }
         return batchOperations;
+    }
+
+    private static void tryAddBatchOperation(List<ContentProviderOperation> operationList,
+                                             JSONObject jsonObject) throws JSONException {
+        if (!jsonObject.getString("Bid").equals("null")) {
+            operationList.add(buildBatchOperation(jsonObject));
+        }
     }
 
     public static String truncateBidPrice(String bidPrice) {
