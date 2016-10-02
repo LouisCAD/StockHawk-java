@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:configure="com.example.sam_chordas.stockhawk.StockAppWidgetConfigureActivity"
+                    android:configure="com.sam_chordas.android.stockhawk.ui.StockAppWidgetConfigureActivity"
                     android:initialKeyguardLayout="@layout/stock_app_widget"
                     android:initialLayout="@layout/stock_app_widget"
                     android:minHeight="40dp"

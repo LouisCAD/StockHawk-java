@@ -1,4 +1,4 @@
-package com.example.sam_chordas.stockhawk;
+package com.sam_chordas.android.stockhawk.ui;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -16,7 +16,7 @@ public class StockAppWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        CharSequence widgetText = StockAppWidgetConfigureActivity.loadTitlePref(context, appWidgetId);
+        CharSequence widgetText = StockAppWidgetConfigureActivity.Companion.loadTitlePref(context, appWidgetId);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.stock_app_widget);
         views.setTextViewText(R.id.appwidget_text, widgetText);
@@ -37,7 +37,7 @@ public class StockAppWidget extends AppWidgetProvider {
     public void onDeleted(Context context, int[] appWidgetIds) {
         // When the user deletes the widget, delete the preference associated with it.
         for (int appWidgetId : appWidgetIds) {
-            StockAppWidgetConfigureActivity.deleteTitlePref(context, appWidgetId);
+            StockAppWidgetConfigureActivity.Companion.deleteTitlePref(context, appWidgetId);
         }
     }
 

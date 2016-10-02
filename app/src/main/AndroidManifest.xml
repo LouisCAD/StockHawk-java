@@ -43,7 +43,7 @@
             android:authorities="com.sam_chordas.android.stockhawk.data.QuoteProvider"
             android:exported="false"/>
 
-        <receiver android:name="com.example.sam_chordas.stockhawk.StockAppWidget">
+        <receiver android:name=".ui.StockAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -53,7 +53,7 @@
                 android:resource="@xml/stock_app_widget_info"/>
         </receiver>
 
-        <activity android:name="com.example.sam_chordas.stockhawk.StockAppWidgetConfigureActivity">
+        <activity android:name=".ui.StockAppWidgetConfigureActivity">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
