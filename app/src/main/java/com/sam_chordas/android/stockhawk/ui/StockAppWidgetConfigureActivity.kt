@@ -20,7 +20,7 @@ class StockAppWidgetConfigureActivity : Activity(), View.OnClickListener {
 
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if the user presses the back button.
-        setResult(Activity.RESULT_CANCELED)
+        setResult(RESULT_CANCELED)
         setContentView(R.layout.stock_app_widget_configure)
         add_button.setOnClickListener(this)
 
@@ -47,49 +47,46 @@ class StockAppWidgetConfigureActivity : Activity(), View.OnClickListener {
 
         // It is the responsibility of the configuration activity to update the app widget
         val appWidgetManager = AppWidgetManager.getInstance(this)
-        StockAppWidget.updateAppWidget(this, appWidgetManager, mAppWidgetId)
+        updateAppWidget(this, appWidgetManager, mAppWidgetId)
 
         // Make sure we pass back the original appWidgetId
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId)
-        setResult(Activity.RESULT_OK, resultValue)
+        setResult(RESULT_OK, resultValue)
         finish()
-
-    }
-
-    companion object {
-
-        private val PREFS_NAME = "com.sam_chordas.android.stockhawk.ui.StockAppWidget"
-        private val PREF_PREFIX_KEY = "appwidget_"
-
-        /**
-         * Write the prefix to the SharedPreferences object for this widget
-         */
-        fun saveTitlePref(context: Context, appWidgetId: Int, text: String) {
-            val prefs = context.getSharedPreferences(PREFS_NAME, 0).edit()
-            prefs.putString(PREF_PREFIX_KEY + appWidgetId, text)
-            prefs.apply()
-        }
-
-        /**
-         * Read the prefix from the SharedPreferences object for this widget.
-         * If there is no preference saved, get the default from a resource
-         */
-        fun loadTitlePref(context: Context, appWidgetId: Int): String {
-            val prefs = context.getSharedPreferences(PREFS_NAME, 0)
-            val titleValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null)
-            if (titleValue != null) {
-                return titleValue
-            } else {
-                return context.getString(R.string.appwidget_text)
-            }
-        }
-
-        fun deleteTitlePref(context: Context, appWidgetId: Int) {
-            val prefs = context.getSharedPreferences(PREFS_NAME, 0).edit()
-            prefs.remove(PREF_PREFIX_KEY + appWidgetId)
-            prefs.apply()
-        }
     }
 }
+
+private val PREFS_NAME = "com.sam_chordas.android.stockhawk.ui.StockAppWidget"
+private val PREF_PREFIX_KEY = "appwidget_"
+
+/**
+ * Write the prefix to the SharedPreferences object for this widget
+ */
+fun saveTitlePref(context: Context, appWidgetId: Int, text: String) {
+    val prefs = context.getSharedPreferences(PREFS_NAME, 0).edit()
+    prefs.putString(PREF_PREFIX_KEY + appWidgetId, text)
+    prefs.apply()
+}
+
+/**
+ * Read the prefix from the SharedPreferences object for this widget.
+ * If there is no preference saved, get the default from a resource
+ */
+fun loadTitlePref(context: Context, appWidgetId: Int): String {
+    val prefs = context.getSharedPreferences(PREFS_NAME, 0)
+    val titleValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null)
+    if (titleValue != null) {
+        return titleValue
+    } else {
+        return context.getString(R.string.appwidget_text)
+    }
+}
+
+fun deleteWidgetTitlePref(context: Context, appWidgetId: Int) {
+    val prefs = context.getSharedPreferences(PREFS_NAME, 0).edit()
+    prefs.remove(PREF_PREFIX_KEY + appWidgetId)
+    prefs.apply()
+}
+
 
