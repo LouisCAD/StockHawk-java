@@ -26,7 +26,7 @@ import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperViewHolder;
 public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAdapter.ViewHolder>
     implements ItemTouchHelperAdapter{
 
-  private static Context mContext;
+  private Context mContext;
   private static Typeface robotoLight;
   private boolean isPercent;
   public QuoteCursorAdapter(Context context, Cursor cursor){
