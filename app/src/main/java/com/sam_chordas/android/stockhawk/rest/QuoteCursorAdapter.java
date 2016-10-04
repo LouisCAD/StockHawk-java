@@ -26,20 +26,21 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
         implements ItemTouchHelperAdapter {
 
     private Context mContext;
-    private static Typeface robotoLight;
+    private Typeface robotoLight;
     private boolean isPercent;
 
     public QuoteCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         mContext = context;
+        robotoLight = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Light.ttf");
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        robotoLight = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Light.ttf");
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_quote, parent, false);
         ViewHolder vh = new ViewHolder(itemView);
+        vh.symbol.setTypeface(robotoLight);
         return vh;
     }
 
@@ -82,7 +83,6 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
         public ViewHolder(View itemView) {
             super(itemView);
             symbol = (TextView) itemView.findViewById(R.id.stock_symbol);
-            symbol.setTypeface(robotoLight);
             bidPrice = (TextView) itemView.findViewById(R.id.bid_price);
             change = (TextView) itemView.findViewById(R.id.change);
         }
