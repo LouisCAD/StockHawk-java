@@ -3,6 +3,7 @@ package com.sam_chordas.android.stockhawk.rest;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
 /**
@@ -13,11 +14,12 @@ import android.support.v7.widget.RecyclerView;
  */
 public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>{
   private static final String LOG_TAG = CursorRecyclerViewAdapter.class.getSimpleName();
+  @Nullable
   private Cursor mCursor;
   private boolean dataIsValid;
   private int rowIdColumn;
   private DataSetObserver mDataSetObserver;
-  public CursorRecyclerViewAdapter(Context context, Cursor cursor){
+  public CursorRecyclerViewAdapter(Context context, @Nullable Cursor cursor){
     mCursor = cursor;
     dataIsValid = cursor != null;
     rowIdColumn = dataIsValid ? mCursor.getColumnIndex("_id") : -1;
@@ -57,6 +59,7 @@ public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHol
     if (!dataIsValid){
       throw new IllegalStateException("This should only be called when Cursor is valid");
     }
+    assert mCursor != null;
     if (!mCursor.moveToPosition(position)){
       throw new IllegalStateException("Could not move Cursor to position: " + position);
     }
@@ -64,7 +67,8 @@ public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHol
     onBindViewHolder(viewHolder, mCursor);
   }
 
-  public Cursor swapCursor(Cursor newCursor){
+  @Nullable
+  public Cursor swapCursor(@Nullable Cursor newCursor){
     if (newCursor == mCursor){
       return null;
     }
