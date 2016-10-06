@@ -20,8 +20,6 @@ public class Utils {
 
     private static String LOG_TAG = Utils.class.getSimpleName();
 
-    public static boolean showPercent = true;
-
     public static ArrayList<ContentProviderOperation> quoteJsonToContentVals(String JSON) {
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
         JSONObject jsonObject = null;

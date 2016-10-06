@@ -29,7 +29,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
     private Context mContext;
     private Typeface robotoLight;
-    private boolean isPercent;
+    private boolean mShowPercent;
     private final Quote.Indexes mIndexes = new Quote.Indexes();
 
     public QuoteCursorAdapter(Context context, Cursor cursor) {
@@ -49,7 +49,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final Cursor cursor) {
-        viewHolder.bind(cursor, mIndexes);
+        viewHolder.bind(cursor, mIndexes, mShowPercent);
     }
 
     @Override
@@ -73,6 +73,11 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
         return super.getItemCount();
     }
 
+    public void changeUnits() {
+        mShowPercent = !mShowPercent;
+        notifyItemRangeChanged(0, getItemCount());
+    }
+
     public static final class ViewHolder extends RecyclerView.ViewHolder
             implements ItemTouchHelperViewHolder, View.OnClickListener {
         public final TextView symbol;
@@ -87,13 +92,13 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
             change = (TextView) itemView.findViewById(R.id.change);
         }
 
-        public void bind(Cursor c, Quote.Indexes i) {
+        public void bind(Cursor c, Quote.Indexes i, boolean showPercent) {
             mQuote.set(c, i);
             symbol.setText(mQuote.symbol);
             bidPrice.setText(mQuote.bidPrice);
             change.setBackgroundResource(mQuote.isUp == 1 ?
                     R.drawable.percent_change_pill_green : R.drawable.percent_change_pill_red);
-            change.setText(Utils.showPercent ? mQuote.percentChange : mQuote.change);
+            change.setText(showPercent ? mQuote.percentChange : mQuote.change);
         }
 
         @Override
