@@ -13,10 +13,10 @@ import com.sam_chordas.android.stockhawk.R
  */
 class StockAppWidget : AppWidgetProvider() {
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(context: Context, widgetManager: AppWidgetManager, widgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+        for (appWidgetId in widgetIds) {
+            updateAppWidget(context, widgetManager, appWidgetId)
         }
     }
 
@@ -45,5 +45,7 @@ fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager,
 
     // Instruct the widget manager to update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views)
+    return
+    TODO("remove code above and update the widget with real data")
 }
 

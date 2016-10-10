@@ -1,43 +1,89 @@
 package com.sam_chordas.android.stockhawk.ui
 
-import android.app.Activity
+import android.app.LoaderManager
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.CursorLoader
 import android.content.Intent
+import android.content.Loader
+import android.database.Cursor
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.sam_chordas.android.stockhawk.R
+import com.sam_chordas.android.stockhawk.data.QuoteColumns
+import com.sam_chordas.android.stockhawk.data.QuoteProvider
+import com.sam_chordas.android.stockhawk.rest.QuoteCursorAdapter
 import kotlinx.android.synthetic.main.stock_app_widget_configure.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.include
 
 /**
  * The configuration screen for the [StockAppWidget] AppWidget.
  */
-class StockAppWidgetConfigureActivity : Activity(), View.OnClickListener {
-    private var mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+class StockAppWidgetConfigureActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener {
 
-    public override fun onCreate(icicle: Bundle?) {
-        super.onCreate(icicle)
+    private val quotesAdapter by lazy { QuoteCursorAdapter(this, null) }
 
-        // Set the result to CANCELED.  This will cause the widget host to cancel
-        // out of the widget placement if the user presses the back button.
+    private val mAppWidgetId by lazy { getWidgetId(intent.extras) }
+
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setResult(RESULT_CANCELED)
-        setContentView(R.layout.stock_app_widget_configure)
-        add_button.setOnClickListener(this)
-
-        // Find the widget id from the intent.
-        val extras = intent.extras
-        if (extras != null) {
-            mAppWidgetId = extras.getInt(
-                    AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-        }
-
-        // If this activity was started with an intent without an app widget ID, finish with an error.
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish()
             return
         }
+        loaderManager.initLoader(0, null, this)
+        alert {
+            title(R.string.add_widget)
+            customView {
+                include<RecyclerView>(R.layout.recyclerview) {
+                    layoutManager = LinearLayoutManager(this@StockAppWidgetConfigureActivity)
+                    adapter = quotesAdapter
+                }
+            }
+            onCancel { finish() }
+            cancelButton({ finish() })
+            positiveButton(R.string.create_widget, { createWidget() })
+        }.show()
+    }
 
-        appwidget_text.setText(loadTitlePref(this, mAppWidgetId))
+    override fun onLoaderReset(loader: Loader<Cursor>?) {
+        quotesAdapter.swapCursor(null)
+    }
+
+    override fun onLoadFinished(loader: Loader<Cursor>?, data: Cursor?) {
+        quotesAdapter.swapCursor(data)
+    }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        val projection = arrayOf(
+                QuoteColumns._ID,
+                QuoteColumns.SYMBOL,
+                QuoteColumns.BIDPRICE,
+                QuoteColumns.PERCENT_CHANGE,
+                QuoteColumns.CHANGE,
+                QuoteColumns.ISUP)
+        return CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
+                projection,
+                QuoteColumns.ISCURRENT + " = ?",
+                arrayOf("1"),
+                null)
+    }
+
+    fun createWidget() {
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        // It is the responsibility of the configuration activity to update the app widget
+        updateAppWidget(this, appWidgetManager, mAppWidgetId)
+        // Make sure we pass back the original appWidgetId
+        val resultValue = Intent()
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId)
+        setResult(RESULT_OK, resultValue)
+        finish()
     }
 
     override fun onClick(v: View) {
@@ -45,15 +91,6 @@ class StockAppWidgetConfigureActivity : Activity(), View.OnClickListener {
         val widgetText = appwidget_text.text.toString()
         saveTitlePref(this, mAppWidgetId, widgetText)
 
-        // It is the responsibility of the configuration activity to update the app widget
-        val appWidgetManager = AppWidgetManager.getInstance(this)
-        updateAppWidget(this, appWidgetManager, mAppWidgetId)
-
-        // Make sure we pass back the original appWidgetId
-        val resultValue = Intent()
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId)
-        setResult(RESULT_OK, resultValue)
-        finish()
     }
 }
 
@@ -88,5 +125,3 @@ fun deleteWidgetTitlePref(context: Context, appWidgetId: Int) {
     prefs.remove(PREF_PREFIX_KEY + appWidgetId)
     prefs.apply()
 }
-
-

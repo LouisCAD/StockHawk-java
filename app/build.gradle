@@ -25,6 +25,10 @@ android {
     }
 }
 
+ext {
+    ankoVersion = '0.9'
+}
+
 repositories {
     maven { url "https://jitpack.io" }
     mavenCentral()
@@ -36,7 +40,17 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     apt 'net.simonvt.schematic:schematic-compiler:0.6.7'
     compile 'net.simonvt.schematic:schematic:0.6.7'
+
     compile 'com.android.support:design:24.2.1'
+
+    // Anko
+    compile "org.jetbrains.anko:anko-sdk15:${ankoVersion}"
+    compile "org.jetbrains.anko:anko-support-v4:${ankoVersion}"
+    compile "org.jetbrains.anko:anko-appcompat-v7:${ankoVersion}"
+    compile "org.jetbrains.anko:anko-design:${ankoVersion}"
+    compile "org.jetbrains.anko:anko-cardview-v7:${ankoVersion}"
+    compile "org.jetbrains.anko:anko-recyclerview-v7:${ankoVersion}"
+
     compile('com.github.afollestad.material-dialogs:core:0.8.5.7@aar') {
         transitive = true
     }

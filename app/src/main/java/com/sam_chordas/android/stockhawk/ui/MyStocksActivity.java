@@ -206,10 +206,17 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        final String[] projection = {
+                QuoteColumns._ID,
+                QuoteColumns.SYMBOL,
+                QuoteColumns.BIDPRICE,
+                QuoteColumns.PERCENT_CHANGE,
+                QuoteColumns.CHANGE,
+                QuoteColumns.ISUP
+        };
         // This narrows the return to only the stocks that are most current.
         return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
-                new String[]{QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
-                        QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP},
+                projection,
                 QuoteColumns.ISCURRENT + " = ?",
                 new String[]{"1"},
                 null);
