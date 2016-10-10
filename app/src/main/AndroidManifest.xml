@@ -55,7 +55,7 @@
 
         <activity
             android:name=".ui.StockAppWidgetConfigureActivity"
-            android:theme="@style/AppTheme.Transparent">
+            android:theme="@style/AppTheme.Dialog">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
