@@ -46,6 +46,7 @@ public class Utils {
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "String to JSON failed: " + e);
+            Log.d(LOG_TAG, JSON);
         }
         return batchOperations;
     }
@@ -96,8 +97,9 @@ public class Utils {
                 builder.withValue(QuoteColumns.ISUP, 1);
             }
 
-        } catch (JSONException e) {
+        } catch (JSONException | NumberFormatException e) {
             e.printStackTrace();
+            Log.e(LOG_TAG, jsonObject.toString());
         }
         return builder.build();
     }

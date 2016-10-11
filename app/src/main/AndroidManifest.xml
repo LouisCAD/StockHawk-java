@@ -60,6 +60,11 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.StockWidgetUpdateIntentService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

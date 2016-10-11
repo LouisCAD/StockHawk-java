@@ -31,13 +31,15 @@ import com.google.android.gms.gcm.Task;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.model.Quote;
 import com.sam_chordas.android.stockhawk.rest.QuoteCursorAdapter;
 import com.sam_chordas.android.stockhawk.rest.RecyclerViewItemClickListener;
 import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
-public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MyStocksActivity extends AppCompatActivity
+        implements QuoteCursorAdapter.ViewHolder.Host, LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -159,6 +161,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
+    @Override
+    public void onClick(@NonNull Quote quote) {
+        // TODO: 10/10/2016 Implement
+    }
 
     @Override
     public void onResume() {

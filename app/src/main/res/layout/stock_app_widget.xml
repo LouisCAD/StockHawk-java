@@ -1,21 +1,30 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#09C"
-                android:padding="@dimen/widget_margin">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#09C"
+    android:orientation="vertical"
+    android:padding="@dimen/widget_margin">
 
     <TextView
-        android:id="@+id/appwidget_text"
+        android:id="@+id/stock_symbol"
+        style="@style/StockSymbolTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_margin="8dp"
-        android:background="#09C"
-        android:contentDescription="@string/appwidget_text"
-        android:text="@string/appwidget_text"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold|italic"/>
+        android:text="@string/googl"
+        android:textColor="#ffffff"/>
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/bid_price"
+        style="@style/BidPriceTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/change"
+        style="@style/PercentChangeTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
