@@ -131,6 +131,7 @@ public class StockTaskService extends GcmTaskService {
             } catch (RemoteException | OperationApplicationException e) {
                 Log.e(LOG_TAG, "Error applying batch insert", e);
             }
+            StockWidgetUpdateIntentServiceKt.requestUpdateAllWidgets(mContext);
         } catch (IOException e) {
             e.printStackTrace();
         }

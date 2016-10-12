@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.service
 
 import android.app.IntentService
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -11,6 +12,7 @@ import com.sam_chordas.android.stockhawk.data.QuoteColumns
 import com.sam_chordas.android.stockhawk.data.QuoteProvider
 import com.sam_chordas.android.stockhawk.model.Quote
 import com.sam_chordas.android.stockhawk.ui.QUOTE_LIST_PROJECTION
+import com.sam_chordas.android.stockhawk.ui.StockAppWidget
 
 class StockWidgetUpdateIntentService : IntentService("StockWidgetUpdateIntentService") {
     val TAG = StockWidgetUpdateIntentService::class.java.simpleName
@@ -37,6 +39,14 @@ class StockWidgetUpdateIntentService : IntentService("StockWidgetUpdateIntentSer
         val quote = loadQuote(this, widgetId) ?: return
         val views = RemoteViews(this.packageName, R.layout.stock_app_widget)
         views.setTextViewText(R.id.stock_symbol, quote.symbol)
+        try {
+            //val change = quote.change.replace("\\s+", "").replace("+", "").toInt()
+            val change = quote.change.toFloat()
+            val bg = if (change < 0) R.drawable.widget_bg_red else R.drawable.widget_bg_green
+            views.setInt(R.id.widget_container, "setBackgroundResource", bg)
+        } catch (e: NumberFormatException) {
+            Log.wtf(TAG, e)
+        }
         views.setTextViewText(R.id.bid_price, quote.bidPrice)
         views.setTextViewText(R.id.change, quote.change) // TODO: 11/10/2016 Support percentage
         AppWidgetManager.getInstance(this).updateAppWidget(widgetId, views)
@@ -53,6 +63,12 @@ fun requestUpdateWidgets(context: Context, widgetIds: IntArray) {
     intent.action = ACTION_UPDATE_WIDGETS
     intent.putExtra(EXTRA_WIDGET_IDS, widgetIds)
     context.startService(intent)
+}
+
+fun requestUpdateAllWidgets(context: Context) {
+    val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(
+            ComponentName(context, StockAppWidget::class.java))
+    requestUpdateWidgets(context, ids)
 }
 
 fun requestUpdateWidget(context: Context, widgetId: Int) {
