@@ -16,6 +16,6 @@
     <string name="configure">Configure</string>
     <string name="add_widget">Add widget</string>
     <string name="googl">GOOGL</string>
-    <string name="widget_initial_bid_price">811.76</string>
-    <string name="widget_initial_change">+0.29%</string>
+    <string name="widget_initial_bid_price">no data</string>
+    <string name="widget_initial_change">no data</string>
 </resources>
