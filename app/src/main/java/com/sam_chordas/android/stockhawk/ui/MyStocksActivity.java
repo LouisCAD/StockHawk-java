@@ -31,15 +31,23 @@ import com.google.android.gms.gcm.Task;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.model.HistoricalQuotesDataResponse;
 import com.sam_chordas.android.stockhawk.model.Quote;
 import com.sam_chordas.android.stockhawk.rest.QuoteCursorAdapter;
-import com.sam_chordas.android.stockhawk.rest.RecyclerViewItemClickListener;
 import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import timber.log.Timber;
+
+import static com.sam_chordas.android.stockhawk.rest.YqlApiKt.buildHistoryQuery;
+import static com.sam_chordas.android.stockhawk.rest.YqlApiKt.getYqlApi;
+
 public class MyStocksActivity extends AppCompatActivity
-        implements QuoteCursorAdapter.ViewHolder.Host, LoaderManager.LoaderCallbacks<Cursor> {
+        implements QuoteCursorAdapter.ViewHolder.Host, LoaderManager.LoaderCallbacks<Cursor>, Callback<HistoricalQuotesDataResponse> {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -83,14 +91,6 @@ public class MyStocksActivity extends AppCompatActivity
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         mCursorAdapter = new QuoteCursorAdapter(this, null);
-        recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
-                new RecyclerViewItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View v, int position) {
-                        //TODO:
-                        // do something on item click
-                    }
-                }));
         recyclerView.setAdapter(mCursorAdapter);
 
 
@@ -163,7 +163,18 @@ public class MyStocksActivity extends AppCompatActivity
 
     @Override
     public void onClick(@NonNull Quote quote) {
-        // TODO: 10/10/2016 Implement
+        // TODO: 10/10/2016 Implement a production ready behavior
+        getYqlApi().getHistoricalQuotesData(buildHistoryQuery(quote.symbol, 1)).enqueue(this);
+    }
+
+    @Override
+    public void onResponse(Call<HistoricalQuotesDataResponse> call, Response<HistoricalQuotesDataResponse> response) {
+        Timber.i(response.message());
+    }
+
+    @Override
+    public void onFailure(Call<HistoricalQuotesDataResponse> call, Throwable t) {
+        Timber.e(t);
     }
 
     @Override
