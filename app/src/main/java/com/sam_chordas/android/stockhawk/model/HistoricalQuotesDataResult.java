@@ -1,5 +1,6 @@
 package com.sam_chordas.android.stockhawk.model;
 
+import com.bluelinelabs.logansquare.annotation.JsonField;
 import com.bluelinelabs.logansquare.annotation.JsonObject;
 
 import java.util.List;
@@ -8,5 +9,6 @@ import static com.bluelinelabs.logansquare.annotation.JsonObject.FieldDetectionP
 
 @JsonObject(fieldDetectionPolicy = NONPRIVATE_FIELDS)
 public class HistoricalQuotesDataResult {
-    public List<QuoteResult> quote;
+    @JsonField(name = "quote")
+    public List<QuoteResult> quotes;
 }

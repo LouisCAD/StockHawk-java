@@ -14,15 +14,15 @@ public class QuoteResult {
     @JsonField(name = "Date")
     public Date date;//"2016-10-20",
     @JsonField(name = "Open")
-    public double openValue;
+    public float openValue;
     @JsonField(name = "High")
-    public double highestValue;
+    public float highestValue;
     @JsonField(name = "Low")
-    public double lowestValue;
+    public float lowestValue;
     @JsonField(name = "Close")
-    public double closeValue;
+    public float closeValue;
     @JsonField(name = "Volume")
     public long volume;
     @JsonField(name = "Adj_Close")
-    public double adjustedClosingValue;
+    public float adjustedClosingValue;
 }
