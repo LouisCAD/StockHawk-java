@@ -35,10 +35,11 @@ class StockDetailsActivity : AppCompatActivity(), Callback<HistoricalQuotesDataR
             val quotes = data.query.results.quotes
             val labels = Array(quotes.size) { "" }
             val values = FloatArray(quotes.size)
-            for((i, quote) in quotes.withIndex()) {
-                values[i] = quote.closeValue
+            for ((i, quote) in quotes.withIndex()) values[i] = quote.closeValue
+            val lines = LineSet(labels, values).apply {
+                color = colorRes(R.color.primary)
+                setDotsColor(colorRes(R.color.accent))
             }
-            val lines = LineSet(labels, values)
             chart.addData(lines)
             chart.show()
         }

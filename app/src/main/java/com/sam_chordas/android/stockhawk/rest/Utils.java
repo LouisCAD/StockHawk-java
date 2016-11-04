@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Created by sam_chordas on 10/8/15.
  */
@@ -53,8 +55,10 @@ public class Utils {
 
     private static void tryAddBatchOperation(List<ContentProviderOperation> operationList,
                                              JSONObject jsonObject) throws JSONException {
-        if (!jsonObject.getString("Bid").equals("null")) {
+        try {
             operationList.add(buildBatchOperation(jsonObject));
+        } catch (Throwable t) {
+            Timber.wtf(t);
         }
     }
 
@@ -80,15 +84,18 @@ public class Utils {
         return change;
     }
 
-    public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject) {
-        ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-                QuoteProvider.Quotes.CONTENT_URI);
+    public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject) throws JSONException {
         try {
+            String bid = jsonObject.getString("Bid");
+            String changeInPercent = jsonObject.getString("ChangeinPercent");
+            if ("null".equals(bid) || "null".equals(changeInPercent))
+                throw new NullPointerException();
+            ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
+                    QuoteProvider.Quotes.CONTENT_URI);
             String change = jsonObject.getString("Change");
             builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
-            builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
-            builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
-                    jsonObject.getString("ChangeinPercent"), true));
+            builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(bid));
+            builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(changeInPercent, true));
             builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
             builder.withValue(QuoteColumns.ISCURRENT, 1);
             if (change.charAt(0) == '-') {
@@ -96,11 +103,11 @@ public class Utils {
             } else {
                 builder.withValue(QuoteColumns.ISUP, 1);
             }
+            return builder.build();
 
         } catch (JSONException | NumberFormatException e) {
-            e.printStackTrace();
             Log.e(LOG_TAG, jsonObject.toString());
+            throw e;
         }
-        return builder.build();
     }
 }
