@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -128,7 +129,7 @@ public class StockTaskService extends GcmTaskService {
                 }
                 mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                         Utils.quoteJsonToContentVals(getResponse));
-            } catch (RemoteException | OperationApplicationException e) {
+            } catch (RemoteException | OperationApplicationException | SQLiteConstraintException e) {
                 Log.e(LOG_TAG, "Error applying batch insert", e);
             }
             StockWidgetUpdateIntentServiceKt.requestUpdateAllWidgets(mContext);

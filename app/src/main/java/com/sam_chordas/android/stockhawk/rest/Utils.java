@@ -44,7 +44,7 @@ public class Utils {
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (JSONException | NumberFormatException e) {
             Log.e(LOG_TAG, "String to JSON failed: " + e);
             Log.d(LOG_TAG, JSON);
         }
