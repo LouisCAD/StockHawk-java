@@ -28,7 +28,8 @@
             android:id="@+id/chart"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            chart:chart_axisColor="?colorPrimary"
-            chart:chart_labelColor="?colorAccent"/>
+            android:padding="16dp"
+            chart:chart_axisColor="@android:color/white"
+            chart:chart_labelColor="@android:color/white"/>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -22,6 +22,7 @@
         <activity
             android:name=".ui.MyStocksActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -71,6 +72,7 @@
         <activity
             android:name=".ui.StockDetailsActivity"
             android:label="@string/title_activity_stock_details"
+            android:launchMode="singleTop"
             android:parentActivityName=".ui.MyStocksActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

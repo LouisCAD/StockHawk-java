@@ -1,8 +1,10 @@
 package com.sam_chordas.android.stockhawk.ui
 
+import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.db.chart.model.LineSet
+import com.db.chart.view.ChartView
 import com.sam_chordas.android.stockhawk.R
 import com.sam_chordas.android.stockhawk.model.HistoricalQuotesDataResponse
 import com.sam_chordas.android.stockhawk.rest.buildHistoryQuery
@@ -35,14 +37,36 @@ class StockDetailsActivity : AppCompatActivity(), Callback<HistoricalQuotesDataR
             val quotes = data.query.results.quotes
             val labels = Array(quotes.size) { "" }
             val values = FloatArray(quotes.size)
-            for ((i, quote) in quotes.withIndex()) values[i] = quote.closeValue
-            val lines = LineSet(labels, values).apply {
-                color = colorRes(R.color.primary)
-                setDotsColor(colorRes(R.color.accent))
+            var max = quotes[0].closeValue
+            var min = max
+            for ((i, quote) in quotes.withIndex()) {
+                val value = quote.closeValue
+                values[i] = value
+                if (value > max) max = value
+                if (value < min) min = value
             }
+            min -= 1; max += 1
+            values.max()
+            val lines = LineSet(labels, values).apply { color = colorRes(R.color.primary) }
+            val gridPaint = Paint().apply { color = 0x2fffffff }
+            val minVal = min.roundDown()
+            val maxVal = max.roundUp()
+            val rows = (maxVal - minVal) / 5
+            chart.setGrid(ChartView.GridType.HORIZONTAL, rows, 1, gridPaint)
             chart.addData(lines)
+            chart.setAxisBorderValues(minVal, maxVal)
+            chart.setStep(5)
             chart.show()
         }
+    }
+
+    private fun Float.roundUp(): Int {
+        return (this.toInt() + 4) / 5 * 5
+    }
+
+    private fun Float.roundDown(): Int {
+        val n = this.toInt()
+        return n - n % 5
     }
 
     override fun onFailure(call: Call<HistoricalQuotesDataResponse>, t: Throwable) {
