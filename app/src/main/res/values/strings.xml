@@ -8,7 +8,7 @@
     <string name="symbol_search">Symbol Search</string>
     <string name="content_test">Search for a Stock Symbol</string>
     <string name="input_hint">FB</string>
-    <string name="input_prefill"></string>
+    <string name="input_prefill"/>
     <string name="create_widget">Create widget</string>
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
     <string name="add_stock">Add a stock</string>
@@ -108,4 +108,8 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="fiveDays">5D</string>
+    <string name="oneMonth">1M</string>
+    <string name="threeMonths">3M</string>
+    <string name="sixMonths">6M</string>
 </resources>
