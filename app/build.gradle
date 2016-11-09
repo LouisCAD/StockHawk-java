@@ -41,6 +41,9 @@ dependencies {
     // Google Play Services
     compile 'com.google.android.gms:play-services-gcm:9.6.1'
 
+    // Agera
+    compile 'com.google.android.agera:agera:1.1.0'
+
     // Networking
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     compile 'com.squareup.retrofit2:retrofit:2.1.0'

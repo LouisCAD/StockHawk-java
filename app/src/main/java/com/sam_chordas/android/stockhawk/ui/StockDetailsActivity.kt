@@ -2,54 +2,84 @@ package com.sam_chordas.android.stockhawk.ui
 
 import android.graphics.Paint
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.db.chart.model.ChartSet
 import com.db.chart.model.LineSet
 import com.db.chart.view.ChartView.GridType.HORIZONTAL
+import com.google.android.agera.Result
 import com.sam_chordas.android.stockhawk.R
-import com.sam_chordas.android.stockhawk.model.HistoricalQuotesDataResponse
+import com.sam_chordas.android.stockhawk.loader.LoadListener
+import com.sam_chordas.android.stockhawk.loader.QuoteHistoryLoader
 import com.sam_chordas.android.stockhawk.model.QuoteResult
-import com.sam_chordas.android.stockhawk.rest.getHistoryForMonths
-import com.sam_chordas.android.stockhawk.rest.yqlApi
 import kotlinx.android.synthetic.main.activity_stock_details.*
 import org.jetbrains.anko.toast
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 
-class StockDetailsActivity : AppCompatActivity(), Callback<HistoricalQuotesDataResponse>, TabLayout.OnTabSelectedListener {
+class StockDetailsActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
+
+    private val symbol by lazy { intent.getStringExtra(EXTRA_QUOTE_SYMBOL)!! }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val symbol = intent.getStringExtra(EXTRA_QUOTE_SYMBOL)
-        if (symbol == null) {
-            finish()
-            return
-        }
         setContentView(R.layout.activity_stock_details)
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        tabLayout.apply {
-            addTab(newTab().setText(R.string.fiveDays))
-            addTab(newTab().setText(R.string.oneMonth))
-            addTab(newTab().setText(R.string.threeMonths))
-            addTab(newTab().setText(R.string.sixMonths))
-            addOnTabSelectedListener(this@StockDetailsActivity)
+        supportActionBar!!.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = symbol
         }
-        yqlApi.getHistoryForMonths(symbol, 6).enqueue(this)
+        tabLayout.apply {
+            addNewTab(R.string.fiveDays)
+            addNewTab(R.string.oneMonth)
+            addNewTab(R.string.threeMonths)
+            addNewTab(R.string.sixMonths)
+        }
+        savedInstanceState?.apply {
+            tabLayout.getTabAt(getInt(KEY_SELECTED_TAB))!!.select()
+        }
+        supportLoaderManager.initLoader(LOADER_HISTORY, null, historyLoadCallback)
+    }
+
+    private val historyLoadCallback by lazy {
+        LoadListener({ QuoteHistoryLoader(this, symbol) }) {
+            loader: QuoteHistoryLoader, data: Result<MutableList<QuoteResult>> ->
+            if (data.succeeded()) {
+                tabLayout.addOnTabSelectedListener(this)
+                updateQuotes(data.get())
+                updateChart(tabLayout.selectedTabPosition)
+                tabLayout.visibility = View.VISIBLE
+            } else if (data.isAbsent) {
+                //TODO: Show that data is loading
+            } else {
+                toast("request failed…")
+                val failReason = data.failureOrNull()
+                if (failReason != null) Timber.wtf(data.failure)
+            }
+        }
+    }
+
+    private val KEY_SELECTED_TAB = "selectedTab"
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(KEY_SELECTED_TAB, tabLayout.selectedTabPosition)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onTabReselected(tab: TabLayout.Tab) = Unit
     override fun onTabUnselected(tab: TabLayout.Tab) = Unit
-    override fun onTabSelected(tab: TabLayout.Tab) = updateChart(when (tab.position) {
+    override fun onTabSelected(tab: TabLayout.Tab) = updateChart(tab.position)
+
+    private fun quotesForTabPosition(position: Int) = when (position) {
         0 -> last5BusinessDaysQuotes
         1 -> lastMonthQuotes
         2 -> last3MonthsQuotes
         else -> last6MonthsQuotes
-    })
+    }
+
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun updateChart(tabPosition: Int) = updateChart(quotesForTabPosition(tabPosition))
 
     private fun updateChart(quotes: MutableList<QuoteResult>) {
         val step = if (quotes.size > 99) 10 else 5
@@ -79,14 +109,6 @@ class StockDetailsActivity : AppCompatActivity(), Callback<HistoricalQuotesDataR
         }
     }
 
-    override fun onResponse(call: Call<HistoricalQuotesDataResponse>, response: Response<HistoricalQuotesDataResponse>) {
-        if (response.isSuccessful) {
-            updateQuotes(response.body().query.results.quotes)
-            updateChart(last5BusinessDaysQuotes)
-            tabLayout.visibility = View.VISIBLE
-        } else toast("request failed…")
-    }
-
     private lateinit var last6MonthsQuotes: MutableList<QuoteResult>
     private lateinit var last3MonthsQuotes: MutableList<QuoteResult>
     private lateinit var lastMonthQuotes: MutableList<QuoteResult>
@@ -105,11 +127,10 @@ class StockDetailsActivity : AppCompatActivity(), Callback<HistoricalQuotesDataR
         return n - n % step
     }
 
-    override fun onFailure(call: Call<HistoricalQuotesDataResponse>, t: Throwable) {
-        Timber.e(t)
-    }
-
     companion object {
         const val EXTRA_QUOTE_SYMBOL = "quote"
+        private const val LOADER_HISTORY = 0
     }
 }
+
+fun TabLayout.addNewTab(@StringRes resId: Int) = addTab(newTab().setText(resId))
