@@ -3,6 +3,8 @@ package com.sam_chordas.android.stockhawk.ui
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.annotation.StringRes
+import android.support.design.widget.Snackbar
+import android.support.design.widget.Snackbar.LENGTH_INDEFINITE
 import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -15,12 +17,13 @@ import com.sam_chordas.android.stockhawk.loader.LoadListener
 import com.sam_chordas.android.stockhawk.loader.QuoteHistoryLoader
 import com.sam_chordas.android.stockhawk.model.QuoteResult
 import kotlinx.android.synthetic.main.activity_stock_details.*
-import org.jetbrains.anko.toast
 import timber.log.Timber
 
 class StockDetailsActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
 
     private val symbol by lazy { intent.getStringExtra(EXTRA_QUOTE_SYMBOL)!! }
+
+    private var snackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +49,17 @@ class StockDetailsActivity : AppCompatActivity(), TabLayout.OnTabSelectedListene
         LoadListener({ QuoteHistoryLoader(this, symbol) }) {
             loader: QuoteHistoryLoader, data: Result<MutableList<QuoteResult>> ->
             if (data.succeeded()) {
+                snackbar?.dismiss()
                 tabLayout.addOnTabSelectedListener(this)
                 updateQuotes(data.get())
                 updateChart(tabLayout.selectedTabPosition)
                 tabLayout.visibility = View.VISIBLE
             } else if (data.isAbsent) {
-                //TODO: Show that data is loading
+                snackbar?.dismiss()
+                snackbar = cl.snack(R.string.loading, LENGTH_INDEFINITE)
             } else {
-                toast("request failed…")
+                snackbar?.dismiss()
+                snackbar = cl.snack(R.string.request_failed, LENGTH_INDEFINITE)
                 val failReason = data.failureOrNull()
                 if (failReason != null) Timber.wtf(data.failure)
             }

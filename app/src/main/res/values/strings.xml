@@ -112,4 +112,6 @@
     <string name="oneMonth">1M</string>
     <string name="threeMonths">3M</string>
     <string name="sixMonths">6M</string>
+    <string name="loading">loading…</string>
+    <string name="request_failed">request failed…</string>
 </resources>
