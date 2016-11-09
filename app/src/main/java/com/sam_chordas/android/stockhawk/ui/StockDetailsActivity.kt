@@ -2,7 +2,6 @@ package com.sam_chordas.android.stockhawk.ui
 
 import android.graphics.Paint
 import android.os.Bundle
-import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.design.widget.Snackbar.LENGTH_INDEFINITE
 import android.support.design.widget.TabLayout
@@ -139,4 +138,3 @@ class StockDetailsActivity : AppCompatActivity(), TabLayout.OnTabSelectedListene
     }
 }
 
-fun TabLayout.addNewTab(@StringRes resId: Int) = addTab(newTab().setText(resId))

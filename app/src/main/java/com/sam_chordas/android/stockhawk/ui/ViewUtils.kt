@@ -3,7 +3,9 @@
 package com.sam_chordas.android.stockhawk.ui
 
 import android.support.annotation.IntegerRes
+import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
+import android.support.design.widget.TabLayout
 import android.view.View
 import org.jetbrains.anko.onLongClick
 import org.jetbrains.anko.toast
@@ -23,6 +25,8 @@ inline fun consume(f: () -> Any): Boolean {
     f()
     return true;
 }
+
+fun TabLayout.addNewTab(@StringRes resId: Int) = addTab(newTab().setText(resId))
 
 inline fun View.snack(@IntegerRes messageRes: Int, length: Int = Snackbar.LENGTH_LONG): Snackbar {
     val snack = Snackbar.make(this, resources.getString(messageRes), length)
