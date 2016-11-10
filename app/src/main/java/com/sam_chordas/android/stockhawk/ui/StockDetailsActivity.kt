@@ -6,7 +6,6 @@ import android.support.design.widget.Snackbar
 import android.support.design.widget.Snackbar.LENGTH_INDEFINITE
 import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import com.db.chart.model.ChartSet
 import com.db.chart.model.LineSet
 import com.db.chart.view.ChartView.GridType.HORIZONTAL
@@ -52,7 +51,6 @@ class StockDetailsActivity : AppCompatActivity(), TabLayout.OnTabSelectedListene
                 tabLayout.addOnTabSelectedListener(this)
                 updateQuotes(data.get())
                 updateChart(tabLayout.selectedTabPosition)
-                tabLayout.visibility = View.VISIBLE
             } else if (data.isAbsent) {
                 snackbar?.dismiss()
                 snackbar = cl.snack(R.string.loading, LENGTH_INDEFINITE)
