@@ -114,4 +114,5 @@
     <string name="sixMonths">6M</string>
     <string name="loading">loading…</string>
     <string name="request_failed">request failed…</string>
+    <string name="no_connection">No internet connection</string>
 </resources>

@@ -13,6 +13,7 @@ import android.text.InputType
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.agera.Updatable
@@ -35,14 +36,6 @@ import kotlin.LazyThreadSafetyMode.NONE
 
 class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host {
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-
-    /**
-     * Used to store the last screen title. For use in [.restoreActionBar].
-     */
-    private var mTitle: CharSequence? = null
     private val mCursorAdapter by lazy(NONE) { QuoteCursorAdapter(this, null) }
 
     private val connectivityListener by lazy(NONE) { ConnectivityListener(this) }
@@ -50,6 +43,7 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_stocks)
+        setSupportActionBar(toolbar)
         // The intent service is for executing immediate pulls from the Yahoo API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
         val serviceIntent = Intent(this, StockIntentService::class.java)
@@ -96,7 +90,6 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
         val callback = SimpleItemTouchHelperCallback(mCursorAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(recyclerView)
 
-        mTitle = title
         if (connectivityListener.isNetworkConnected) {
             val period = 3600L
             val flex = 10L
@@ -132,7 +125,7 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
     private val onConnectionChanged = Updatable {
         val isConnected = connectivityListener.isNetworkConnected
         fab.isEnabled = isConnected
-        // TODO: 10/11/2016 Show no connection in the appbar
+        no_connection_text.visibility = if(isConnected) View.GONE else View.VISIBLE
     }
 
     override fun onPause() {
@@ -140,15 +133,8 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
         connectivityListener.removeUpdatable(onConnectionChanged)
     }
 
-    fun restoreActionBar() {
-        val actionBar = supportActionBar!!
-        actionBar.setDisplayShowTitleEnabled(true)
-        actionBar.title = mTitle
-    }
-
     override fun onCreateOptionsMenu(menu: Menu) = consume {
         menuInflater.inflate(R.menu.my_stocks, menu)
-        restoreActionBar()
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
