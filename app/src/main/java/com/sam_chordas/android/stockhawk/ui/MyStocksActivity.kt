@@ -57,34 +57,36 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
         supportLoaderManager.initLoader(CURSOR_LOADER_ID, null, quotesLoadCallback)
 
         recyclerView.adapter = mCursorAdapter
-
-        fab.setOnClickListener {
-            MaterialDialog.Builder(this).title(R.string.symbol_search)
-                    .titleColor(Color.BLACK)
-                    .contentColor(Color.BLACK)
-                    .content(R.string.content_test)
-                    .inputType(InputType.TYPE_CLASS_TEXT)
-                    .input(R.string.input_hint, R.string.input_prefill, MaterialDialog.InputCallback { dialog, input ->
-                        // On FAB click, receive user input. Make sure the stock doesn't already exist
-                        // in the DB and proceed accordingly
-                        val c = contentResolver.query(QuoteProvider.Quotes.CONTENT_URI,
-                                arrayOf(QuoteColumns.SYMBOL), QuoteColumns.SYMBOL + "= ?",
-                                arrayOf(input.toString()), null)
-                        if (c != null && c.count != 0) {
-                            val toast = Toast.makeText(this@MyStocksActivity, R.string.stock_already_saved,
-                                    Toast.LENGTH_LONG)
-                            toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0)
-                            toast.show()
-                            return@InputCallback
-                        } else {
-                            // Add the stock to DB
-                            serviceIntent.putExtra("tag", "add")
-                            serviceIntent.putExtra("symbol", input.toString())
-                            startService(serviceIntent)
-                        }
-                        c?.close()
-                    })
-                    .show()
+        fab.apply {
+            bindLongClickToContentDesc()
+            setOnClickListener {
+                MaterialDialog.Builder(this@MyStocksActivity).title(R.string.symbol_search)
+                        .titleColor(Color.BLACK)
+                        .contentColor(Color.BLACK)
+                        .content(R.string.content_test)
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .input(R.string.input_hint, R.string.input_prefill, MaterialDialog.InputCallback { dialog, input ->
+                            // On FAB click, receive user input. Make sure the stock doesn't already exist
+                            // in the DB and proceed accordingly
+                            val c = contentResolver.query(QuoteProvider.Quotes.CONTENT_URI,
+                                    arrayOf(QuoteColumns.SYMBOL), QuoteColumns.SYMBOL + "= ?",
+                                    arrayOf(input.toString()), null)
+                            if (c != null && c.count != 0) {
+                                val toast = Toast.makeText(this@MyStocksActivity, R.string.stock_already_saved,
+                                        Toast.LENGTH_LONG)
+                                toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0)
+                                toast.show()
+                                return@InputCallback
+                            } else {
+                                // Add the stock to DB
+                                serviceIntent.putExtra("tag", "add")
+                                serviceIntent.putExtra("symbol", input.toString())
+                                startService(serviceIntent)
+                            }
+                            c?.close()
+                        })
+                        .show()
+            }
         }
 
         val callback = SimpleItemTouchHelperCallback(mCursorAdapter)
