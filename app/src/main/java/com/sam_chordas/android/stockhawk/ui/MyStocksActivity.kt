@@ -43,35 +43,25 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
      * Used to store the last screen title. For use in [.restoreActionBar].
      */
     private var mTitle: CharSequence? = null
-    private var mServiceIntent: Intent? = null
-    private var mCursorAdapter: QuoteCursorAdapter? = null
+    private val mCursorAdapter by lazy(NONE) { QuoteCursorAdapter(this, null) }
 
     private val connectivityListener by lazy(NONE) { ConnectivityListener(this) }
-
-    private val onConnectionChanged = Updatable {
-        val isConnected = connectivityListener.isNetworkConnected
-        fab.isEnabled = isConnected
-        // TODO: 10/11/2016 Show no connection in the appbar
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_stocks)
         // The intent service is for executing immediate pulls from the Yahoo API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
-        mServiceIntent = Intent(this, StockIntentService::class.java)
+        val serviceIntent = Intent(this, StockIntentService::class.java)
         if (savedInstanceState == null) {
             // Run the initialize task service so that some stocks appear upon an empty database
-            mServiceIntent!!.putExtra("tag", "init")
-            if (connectivityListener.isNetworkConnected) {
-                startService(mServiceIntent)
-            }
+            serviceIntent.putExtra("tag", "init")
+            if (connectivityListener.isNetworkConnected) startService(serviceIntent)
         }
         val recyclerView = findViewById(R.id.recycler_view) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         supportLoaderManager.initLoader(CURSOR_LOADER_ID, null, quotesLoadCallback)
 
-        mCursorAdapter = QuoteCursorAdapter(this, null)
         recyclerView.adapter = mCursorAdapter
 
         fab.setOnClickListener {
@@ -94,9 +84,9 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
                             return@InputCallback
                         } else {
                             // Add the stock to DB
-                            mServiceIntent!!.putExtra("tag", "add")
-                            mServiceIntent!!.putExtra("symbol", input.toString())
-                            startService(mServiceIntent)
+                            serviceIntent.putExtra("tag", "add")
+                            serviceIntent.putExtra("symbol", input.toString())
+                            startService(serviceIntent)
                         }
                         c?.close()
                     })
@@ -139,6 +129,12 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
         supportLoaderManager.restartLoader(CURSOR_LOADER_ID, null, quotesLoadCallback)
     }
 
+    private val onConnectionChanged = Updatable {
+        val isConnected = connectivityListener.isNetworkConnected
+        fab.isEnabled = isConnected
+        // TODO: 10/11/2016 Show no connection in the appbar
+    }
+
     override fun onPause() {
         super.onPause()
         connectivityListener.removeUpdatable(onConnectionChanged)
@@ -156,7 +152,7 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.action_change_units -> consume { mCursorAdapter!!.changeUnits() }
+        R.id.action_change_units -> consume { mCursorAdapter.changeUnits() }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -169,10 +165,10 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
                 QuoteColumns.ISCURRENT + " = ?",
                 arrayOf("1"),
                 null)
-    }, { mCursorAdapter!!.swapCursor(null) }
+    }, { mCursorAdapter.swapCursor(null) }
     ) {
         loader: CursorLoader, data: Cursor ->
-        mCursorAdapter!!.swapCursor(data)
+        mCursorAdapter.swapCursor(data)
     }
 
     companion object {
