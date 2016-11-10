@@ -156,7 +156,6 @@ public class MyStocksActivity extends AppCompatActivity
 
     @Override
     public void onClick(@NonNull Quote quote) {
-        // TODO: 10/10/2016 Implement a production ready behavior
         startActivity(new Intent(this, StockDetailsActivity.class).putExtra(EXTRA_QUOTE_SYMBOL, quote.symbol));
     }
 
