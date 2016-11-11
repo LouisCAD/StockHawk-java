@@ -118,10 +118,11 @@ class StockDetailsActivity : AppCompatActivity(), TabLayout.OnTabSelectedListene
     private lateinit var last5BusinessDaysQuotes: MutableList<QuoteResult>
 
     private fun updateQuotes(quotes: MutableList<QuoteResult>) {
+        val end = quotes.size
         last6MonthsQuotes = quotes
-        last3MonthsQuotes = quotes.subList(0, quotes.size / 2)
-        lastMonthQuotes = quotes.subList(0, quotes.size / 6)
-        last5BusinessDaysQuotes = quotes.subList(0, 5)
+        last3MonthsQuotes = quotes.subList(end - quotes.size / 2, end)
+        lastMonthQuotes = quotes.subList(end - quotes.size / 6, end)
+        last5BusinessDaysQuotes = quotes.subList(end - 5, end)
     }
 
     private fun Float.roundUp(step: Int): Int = this.roundDown(step) + step

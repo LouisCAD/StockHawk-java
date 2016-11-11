@@ -14,6 +14,6 @@ class QuoteHistoryLoader(context: Context, private val symbol: String)
         get() = yqlApi.getHistoryForMonths(symbol, 6)
 
     override fun transformResponse(body: HistoricalQuotesDataResponse): MutableList<QuoteResult> {
-        return body.query.results.quotes
+        return body.query.results.quotes.apply { reverse() }
     }
 }
