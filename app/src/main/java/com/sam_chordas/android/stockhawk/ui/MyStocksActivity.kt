@@ -91,8 +91,24 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
 
         val callback = SimpleItemTouchHelperCallback(mCursorAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(recyclerView)
+    }
 
-        if (connectivityListener.isNetworkConnected) {
+    override fun onClick(quote: Quote) {
+        startActivity(Intent(this, StockDetailsActivity::class.java).putExtra(EXTRA_QUOTE_SYMBOL, quote.symbol))
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        connectivityListener.addUpdatable(onConnectionChanged)
+        onConnectionChanged.update()
+        supportLoaderManager.restartLoader(CURSOR_LOADER_ID, null, quotesLoadCallback)
+    }
+
+    private val onConnectionChanged = Updatable {
+        val isConnected = connectivityListener.isNetworkConnected
+        fab.isEnabled = isConnected
+        no_connection_text.visibility = if(isConnected) View.GONE else View.VISIBLE
+        if (isConnected) {
             val period = 3600L
             val flex = 10L
             val periodicTag = "periodic"
@@ -111,23 +127,6 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
             // are updated.
             GcmNetworkManager.getInstance(this).schedule(periodicTask)
         }
-    }
-
-    override fun onClick(quote: Quote) {
-        startActivity(Intent(this, StockDetailsActivity::class.java).putExtra(EXTRA_QUOTE_SYMBOL, quote.symbol))
-    }
-
-    public override fun onResume() {
-        super.onResume()
-        connectivityListener.addUpdatable(onConnectionChanged)
-        onConnectionChanged.update()
-        supportLoaderManager.restartLoader(CURSOR_LOADER_ID, null, quotesLoadCallback)
-    }
-
-    private val onConnectionChanged = Updatable {
-        val isConnected = connectivityListener.isNetworkConnected
-        fab.isEnabled = isConnected
-        no_connection_text.visibility = if(isConnected) View.GONE else View.VISIBLE
     }
 
     override fun onPause() {
