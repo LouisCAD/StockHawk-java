@@ -27,6 +27,7 @@ import com.sam_chordas.android.stockhawk.data.QuoteProvider
 import com.sam_chordas.android.stockhawk.loader.LoadListener
 import com.sam_chordas.android.stockhawk.model.Quote
 import com.sam_chordas.android.stockhawk.rest.QuoteCursorAdapter
+import com.sam_chordas.android.stockhawk.runOnce
 import com.sam_chordas.android.stockhawk.service.StockIntentService
 import com.sam_chordas.android.stockhawk.service.StockTaskService
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback
@@ -44,14 +45,6 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_stocks)
         setSupportActionBar(toolbar)
-        // The intent service is for executing immediate pulls from the Yahoo API
-        // GCMTaskService can only schedule tasks, they cannot execute immediately
-        val serviceIntent = Intent(this, StockIntentService::class.java)
-        if (savedInstanceState == null) {
-            // Run the initialize task service so that some stocks appear upon an empty database
-            serviceIntent.putExtra("tag", "init")
-            if (connectivityListener.isNetworkConnected) startService(serviceIntent)
-        }
         val recyclerView = findViewById(R.id.recycler_view) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         supportLoaderManager.initLoader(CURSOR_LOADER_ID, null, quotesLoadCallback)
@@ -79,6 +72,7 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
                                 return@InputCallback
                             } else {
                                 // Add the stock to DB
+                                val serviceIntent = Intent(this@MyStocksActivity, StockIntentService::class.java)
                                 serviceIntent.putExtra("tag", "add")
                                 serviceIntent.putExtra("symbol", input.toString())
                                 startService(serviceIntent)
@@ -107,8 +101,14 @@ class MyStocksActivity : AppCompatActivity(), QuoteCursorAdapter.ViewHolder.Host
     private val onConnectionChanged = Updatable {
         val isConnected = connectivityListener.isNetworkConnected
         fab.isEnabled = isConnected
-        no_connection_text.visibility = if(isConnected) View.GONE else View.VISIBLE
+        no_connection_text.visibility = if (isConnected) View.GONE else View.VISIBLE
         if (isConnected) {
+            runOnce("init_with_some_stocks") {
+                // Run the initialize task service so that some stocks appear upon an empty database
+                val serviceIntent = Intent(this, StockIntentService::class.java)
+                serviceIntent.putExtra("tag", "init")
+                startService(serviceIntent)
+            }
             val period = 3600L
             val flex = 10L
             val periodicTag = "periodic"
